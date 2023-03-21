@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .slide {
+    @apply dark:bg-black min-h-full w-full flex justify-center px-10 items-center;
+  }
+  .slideBox {
+    @apply dark:text-[#ffffffb3] flex flex-col justify-center gap-4 max-w-[720px] w-full mx-auto;
+  }
+}
+
+[list]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: text;
+}
+.input-multiple:checked ~ * .alphabet {
+  background-color: white;
+  color: black;
+}
+.input-multiple:checked ~ * .check-icon {
+  visibility: visible;
+  color: white;
+}
+.blink {
+  -webkit-animation: 0.25s ease 0s 2 normal none running;
+  animation: 0.25s ease 0s 2 normal none running;
+  -webkit-animation-name: blink;
+  animation-name: blink;
+}
+
+@-webkit-keyframes blink {
+  0% {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  25% {
+    background-color: white;
+    color: black;
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+  }
+}
+
+@keyframes blink {
+  0% {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  25% {
+    background-color: white;
+    color: black;
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+  }
+}
+
+.transition-blink {
+  transition-property: background-color, color, border-color, box-shadow,
+    opacity;
+  transition-duration: 0.1s;
+  transition-timing-function: ease-out;
+}
