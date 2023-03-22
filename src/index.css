@@ -2,9 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Questrial";
+  src: url("./fonts/Questrial-Regular.ttf") format("truetype");
+}
+
+@layer base {
+  html {
+    font-family: Questrial, system-ui, sans-serif;
+  }
+}
+
 @layer components {
   .slide {
-    @apply dark:bg-black min-h-full w-full flex justify-center px-10 items-center;
+    @apply absolute dark:bg-black min-h-full w-full flex justify-center px-10 items-center opacity-0;
   }
   .slideBox {
     @apply dark:text-[#ffffffb3] flex flex-col justify-center gap-4 max-w-[720px] w-full mx-auto;
@@ -57,10 +68,76 @@
     color: white;
   }
 }
-
 .transition-blink {
   transition-property: background-color, color, border-color, box-shadow,
     opacity;
   transition-duration: 0.1s;
   transition-timing-function: ease-out;
+}
+.transition-block {
+  transition: transform 600ms ease 0s, opacity 300ms ease 0s;
+}
+.translate-y-0 {
+  transform: translateY(0);
+  opacity: 1;
+}
+.translate-y-100 {
+  transform: translateY(100%);
+}
+.-translate-y-100 {
+  transform: translateY(-100%);
+}
+.translate-y-200 {
+  transform: translateY(200%);
+}
+.-translate-y-200 {
+  transform: translateY(-200%);
+}
+.translate-y-300 {
+  transform: translateY(300%);
+}
+.-translate-y-300 {
+  transform: translateY(-300%);
+}
+.translate-y-400 {
+  transform: translateY(400%);
+}
+.-translate-y-400 {
+  transform: translateY(-400%);
+}
+.translate-y-500 {
+  transform: translateY(500%);
+}
+.-translate-y-500 {
+  transform: translateY(-500%);
+}
+.translate-y-600 {
+  transform: translateY(600%);
+}
+.-translate-y-600 {
+  transform: translateY(-600%);
+}
+.translate-y-700 {
+  transform: translateY(700%);
+}
+.-translate-y-700 {
+  transform: translateY(-700%);
+}
+.translate-y-800 {
+  transform: translateY(800%);
+}
+.-translate-y-800 {
+  transform: translateY(-800%);
+}
+.translate-y-900 {
+  transform: translateY(900%);
+}
+.-translate-y-900 {
+  transform: translateY(-900%);
+}
+.translate-y-1000 {
+  transform: translateY(1000%);
+}
+.-translate-y-1000 {
+  transform: translateY(-1000%);
 }

@@ -7,6 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function App() {
+  const [slide, setSlide] = useState<number>(0);
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const roleChoices = [
     { id: "A", description: "Founder or CXO" },
@@ -40,6 +41,13 @@ function App() {
     },
   ];
 
+  const getTranslateValue = (pos: number) => {
+    let translateValue = slide * 100 - pos * 100;
+    return translateValue > 0
+      ? `-translate-y-${Math.abs(translateValue)} opacity-0`
+      : `translate-y-${Math.abs(translateValue)} opacity-0`;
+  };
+
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="h-screen dark:bg-black relative">
@@ -56,7 +64,22 @@ function App() {
               alt="GrowthX Logo"
             />
           </div>
-
+          <button
+            className="dark:text-white"
+            onClick={() => {
+              setSlide((slide) => slide + 1);
+            }}
+          >
+            Slide+
+          </button>
+          <button
+            className="dark:text-white"
+            onClick={() => {
+              setSlide((slide) => slide - 1);
+            }}
+          >
+            Slide-
+          </button>
           <button
             className="dark:text-white"
             onClick={() => {
@@ -67,8 +90,8 @@ function App() {
           </button>
         </nav>
         {/* Typeform */}
-        <form className="pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800">
-          <div className="slide">
+        <form className="pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800 overflow-hidden">
+          <div className={`slide transition-block ${getTranslateValue(0)}`}>
             <div className="slideBox">
               <div className="flex flex-col gap-2">
                 <span className="text-xl sm:text-2xl dark:text-white">
@@ -99,7 +122,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(1)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
@@ -131,7 +154,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(2)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
@@ -163,7 +186,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(3)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
@@ -207,7 +230,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(4)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
@@ -263,7 +286,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(5)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
@@ -317,7 +340,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(6)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
@@ -349,7 +372,7 @@ function App() {
             </div>
           </div>
 
-          <div className="slide">
+          <div className={`slide transition-block ${getTranslateValue(7)}`}>
             <div className="slideBox">
               <span className="block w-full text-xl sm:text-2xl relative dark:text-white">
                 <span className="absolute right-full mr-3">1) </span>
