@@ -1,11 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
     extend: {
       screens: {
         sm: "576px",
+        mid: "1024px",
       },
       boxShadow: {
         input: "0px 1px 0px 0px rgba(255, 255, 255, 0.3)",
