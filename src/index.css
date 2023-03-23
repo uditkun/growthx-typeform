@@ -35,19 +35,16 @@ input:-webkit-autofill:active {
   opacity: 0;
   cursor: text;
 }
-.input-multiple:checked ~ * .alphabet {
+/* .input-multiple:checked ~ * .alphabet {
   background-color: white;
   color: black;
 }
 .input-multiple:checked ~ * .check-icon {
   visibility: visible;
   color: white;
-}
-.industry-input:focus + .drop-icon {
+} */
+.drop-icon {
   transform: rotateZ(180deg);
-}
-.industry-input:focus ~ .industry {
-  display: flex;
 }
 .loader-line {
   width: 200px;

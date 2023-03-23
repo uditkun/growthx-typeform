@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import debounce from "../src/utils/debounce";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,25 +11,79 @@ import {
   faChevronDown,
   faCheck,
   faWarning,
+  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import ButtonBlock from "./components/ButtonBlock";
 import QuestionNumber from "./components/QuestionNumber";
+import useClickOutside from "./hooks/useClickOutside";
 
 type SlideData = {
   slide: number;
-  userData: { [key: string]: string | number };
+  userData: {
+    firstName: string;
+    lastName: string;
+    industry: string;
+    role: string;
+    goal: string[];
+    email: string;
+    phone: number;
+  };
 };
 
 function App() {
   const [error, setError] = useState<boolean>(false);
   const [slideData, setSlideData] = useState<SlideData>({
     slide: 0,
-    userData: {},
+    userData: {
+      firstName: "",
+      lastName: "",
+      industry: "",
+      role: "",
+      goal: [],
+      email: "",
+      phone: 0,
+    },
   });
-  const [industryData, setIndustryData] = useState({
-    isActive: false,
-    industryList: [],
+  const [industryList, setIndustryList] = useState(["1", "2", "3", "4"]);
+  const [flagList, setFlagList] = useState({
+    currentFlag: { code: "in", country: "India" },
+    flagList: [],
   });
+  const isIndustryListActive = useClickOutside("industry-input");
+
+  //fetch industry list
+  useEffect(() => {
+    const getIndustrylist = async () => {
+      try {
+        const data = await fetch(
+          "https://gist.github.com/gxt-admin/758c1973293f54322c054bbd8119e80c",
+          { mode: "no-cors" }
+        ).then((res) => res.json());
+        // console.log(data);
+        setIndustryList((industryList) => data);
+      } catch (err) {
+        console.log("error fetching industry list");
+      }
+    };
+
+    const getFlagslist = async () => {
+      try {
+        const fetchFlags = await fetch(
+          "https://flagcdn.com/en/codes.json"
+        ).then((res) => res.json());
+        console.log(fetchFlags);
+        if (fetchFlags) {
+          setFlagList((flags) => {
+            return { ...flags, flagList: fetchFlags };
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getIndustrylist();
+    // getFlagslist();
+  }, []);
   // const [darkMode, setDarkMode] = useState<boolean>(true);
 
   const getTranslateValue = (pos: number, slide: number) => {
@@ -67,7 +121,6 @@ function App() {
         shouldNav = Boolean(slideData.userData.lastName);
       }
       if (slideData.slide === 3) {
-        console.log(slideData.userData.industry);
         shouldNav = Boolean(slideData.userData.industry);
       }
       if (slideData.slide === 4) {
@@ -243,6 +296,7 @@ function App() {
                 type="text"
                 name="firstName"
                 placeholder="Type your answer here..."
+                defaultValue={slideData.userData.firstName}
                 onChange={onChangeInput}
                 required
               />
@@ -280,6 +334,7 @@ function App() {
                 name="lastName"
                 onChange={onChangeInput}
                 placeholder="Type your answer here..."
+                defaultValue={slideData.userData.lastName}
                 required
               />
               <ButtonBlock
@@ -316,46 +371,57 @@ function App() {
               <span className="-mt-2">
                 We will personalize your learning experience for you
               </span>
-              <div className="relative">
+              <div id="industry-input" className="relative">
                 <input
-                  className="industry-input shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] pr-8 placeholder:text-lightWhite"
+                  className="shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] pr-8 placeholder:text-lightWhite"
                   name="industry"
                   placeholder="Type or select an option"
+                  defaultValue={slideData.userData.industry}
                   required
                 />
                 <FontAwesomeIcon
-                  className="absolute top-7 text-white left-[97%] cursor-pointer drop-icon"
+                  className={`absolute top-7 text-white left-[97%] cursor-pointer ${
+                    isIndustryListActive ? "drop-icon" : ""
+                  }`}
                   size="xs"
                   icon={faChevronDown}
                 ></FontAwesomeIcon>
-                <ul className="hidden bg-black absolute z-10 industry w-full mt-2 flex-col gap-1 text-white max-h-80">
-                  <li
-                    className="py-1 px-2 flex items-center justify between shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block"
-                    onClick={() => {
-                      setSlideData((slideData) => {
-                        return {
-                          ...slideData,
-                          userData: { ...slideData.userData, industry: "1" },
-                        };
-                      });
-                      setError(false);
-                    }}
-                  >
-                    <span>1</span>
-                    <FontAwesomeIcon
-                      className="invisible check-icon"
-                      icon={faCheck}
-                    ></FontAwesomeIcon>
-                  </li>
-                  <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
-                    2
-                  </li>
-                  <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
-                    3
-                  </li>
-                  <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
-                    4
-                  </li>
+                <ul
+                  className={`bg-black absolute z-10 industry w-full mt-2 flex-col gap-1 text-white max-h-80 ${
+                    isIndustryListActive ? "flex" : "hidden"
+                  }`}
+                >
+                  {industryList.map((item: any) => {
+                    return (
+                      <li
+                        key={item}
+                        className="py-1 px-2 flex items-center justify-between gap-2 shadow-checkbox bg-[#ffffff1a] rounded hover:bg-lightWhite cursor-pointer transition-block"
+                        onClick={() => {
+                          setSlideData((slideData) => {
+                            return {
+                              ...slideData,
+                              userData: {
+                                ...slideData.userData,
+                                industry: item,
+                              },
+                            };
+                          });
+                          setError(false);
+                          onEnterSlideChange();
+                        }}
+                      >
+                        <span>{item}</span>
+                        <FontAwesomeIcon
+                          className={`text-white ${
+                            slideData.userData.industry === item
+                              ? "visible"
+                              : "invisible"
+                          }`}
+                          icon={faCheck}
+                        ></FontAwesomeIcon>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
               <ButtonBlock
@@ -393,25 +459,56 @@ function App() {
                     return (
                       <div key={data.id} className="max-w-[256px]">
                         <input
-                          className="hidden peer input-multiple"
+                          className="hidden input-multiple"
                           type="radio"
                           id={data.description}
                           value={data.description}
-                          onChange={onChangeInput}
+                          onChange={(e) => {
+                            console.log(
+                              slideData.userData.role.includes(e.target.value)
+                            );
+                            if (
+                              slideData.userData.role.includes(e.target.value)
+                            ) {
+                              setSlideData((slideData) => {
+                                return {
+                                  ...slideData,
+                                  userData: { ...slideData.userData, role: "" },
+                                };
+                              });
+                            } else {
+                              onChangeInput(e);
+                            }
+                            onEnterSlideChange();
+                          }}
                           name="role"
                         />
                         <label
-                          className="rounded bg-[#ffffff1a] text-base sm:text-xl text-white hover:bg-lightWhite cursor-pointer shadow-checkbox peer-checked:shadow-checkboxActive p-1 px-2 flex justify-between items-center gap-2 w-full"
+                          className={`rounded bg-[#ffffff1a] text-base sm:text-xl text-white hover:bg-lightWhite cursor-pointer p-1 px-2 flex justify-between items-center gap-2 w-full ${
+                            slideData.userData.role === data.description
+                              ? "shadow-checkboxActive"
+                              : "shadow-checkbox"
+                          }`}
                           htmlFor={data.description}
                         >
                           <div className="flex justify-center items-center gap-2">
-                            <span className="w-[22px] h-[22px] text-[12px] bg-black sm:text-sm flex flex-column justify-center items-center font-semibold shadow-checkbox rounded-sm alphabet">
+                            <span
+                              className={`w-[22px] h-[22px] text-[12px] pt-1 bg-black sm:text-sm flex flex-column justify-center items-center font-semibold shadow-checkbox rounded-sm ${
+                                slideData.userData.role === data.description
+                                  ? "bg-white text-black"
+                                  : ""
+                              }`}
+                            >
                               {data.id}
                             </span>
                             <span>{data.description}</span>
                           </div>
                           <FontAwesomeIcon
-                            className="invisible check-icon"
+                            className={`text-white ${
+                              slideData.userData.role === data.description
+                                ? "visible"
+                                : "invisible"
+                            }`}
                             icon={faCheck}
                           ></FontAwesomeIcon>
                         </label>
@@ -458,27 +555,83 @@ function App() {
                       : goalChoicesNonFounder;
                   })().map((data) => {
                     return (
-                      <div key={data.id} className="max-w-[480px]">
+                      <div key={data.id}>
                         <input
-                          className="hidden peer input-multiple"
+                          className="hidden"
                           type="checkbox"
                           id={data.description}
                           value={data.description}
-                          onChange={onChangeInput}
+                          disabled={
+                            !slideData.userData.goal.includes(
+                              data.description
+                            ) && slideData.userData.goal.length === 2
+                          }
+                          onChange={(e) => {
+                            if (slideData.userData.goal.length >= 2) {
+                              return;
+                            }
+                            setSlideData((slideData) => {
+                              const alreadyExists =
+                                slideData.userData.goal.includes(
+                                  e.target.value
+                                );
+                              if (alreadyExists) {
+                                const newGoal = slideData.userData.goal.filter(
+                                  (item) => item.includes(e.target.value)
+                                );
+                                return {
+                                  ...slideData,
+                                  userData: {
+                                    ...slideData.userData,
+                                    goal: newGoal,
+                                  },
+                                };
+                              } else {
+                                const newGoal = [
+                                  ...slideData.userData.goal,
+                                  e.target.value,
+                                ];
+                                return {
+                                  ...slideData,
+                                  userData: {
+                                    ...slideData.userData,
+                                    goal: newGoal,
+                                  },
+                                };
+                              }
+                            });
+                            // onEnterSlideChange();
+                          }}
                           name="goal"
                         />
                         <label
-                          className="rounded bg-[#ffffff1a] text-base sm:text-xl text-white hover:bg-lightWhite cursor-pointer shadow-checkbox peer-checked:shadow-checkboxActive p-1 px-2 flex justify-between items-center gap-2 w-full"
+                          className={`rounded bg-[#ffffff1a] text-base sm:text-xl text-white hover:bg-lightWhite cursor-pointer p-1 px-2 flex justify-between items-center gap-2 w-full ${
+                            slideData.userData.goal.includes(data.description)
+                              ? "shadow-checkboxActive"
+                              : "shadow-checkbox"
+                          }`}
                           htmlFor={data.description}
                         >
                           <div className="flex justify-center items-center gap-2">
-                            <span className="w-[22px] h-[22px] text-[12px] bg-black sm:text-sm flex flex-column justify-center items-center font-semibold shadow-checkbox rounded-sm alphabet">
+                            <span
+                              className={`w-[22px] h-[22px] text-[12px] pt-1 bg-black sm:text-sm flex flex-column justify-center items-center font-semibold shadow-checkbox rounded-sm ${
+                                slideData.userData.goal.includes(
+                                  data.description
+                                )
+                                  ? "bg-white text-black"
+                                  : ""
+                              }`}
+                            >
                               {data.id}
                             </span>
                             <span>{data.description}</span>
                           </div>
                           <FontAwesomeIcon
-                            className="invisible check-icon"
+                            className={`text-white ${
+                              slideData.userData.role === data.description
+                                ? "visible"
+                                : "invisible"
+                            }`}
                             icon={faCheck}
                           ></FontAwesomeIcon>
                         </label>
@@ -557,14 +710,31 @@ function App() {
                 We won't call you unless it is absolutely required to process
                 your application.
               </span>
-              <input
-                className="max-w-[450px] shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] placeholder:text-lightWhite"
-                type="tel"
-                name="phone"
-                placeholder="1234567899"
-                onChange={onChangeInput}
-                required
-              />
+              <div className="flex gap-2">
+                <div className="w-fit shadow-input">
+                  <span className="flex gap-2 mt-5 pr-2">
+                    <img
+                      src={`https://flagcdn.com/${flagList.currentFlag.code}.svg`}
+                      width="30"
+                      alt={flagList.currentFlag.country}
+                    />
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      color="white"
+                      size="sm"
+                    ></FontAwesomeIcon>
+                  </span>
+                  <ul className="absolute">{}</ul>
+                </div>
+                <input
+                  className="max-w-[450px] shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] placeholder:text-lightWhite"
+                  type="tel"
+                  name="phone"
+                  placeholder="1234567899"
+                  onChange={onChangeInput}
+                  required
+                />
+              </div>
               <div
                 className={`rounded transition-block border border-red-600 bg-red-100 text-red-700 px-2 py-1 flex gap-2 items-center ${
                   error ? "visible" : "invisible"
