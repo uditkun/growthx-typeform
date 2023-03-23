@@ -22,6 +22,15 @@
   }
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-transition: background-color 5000s;
+  transition: background-color 5000s;
+  -webkit-text-fill-color: #fff !important;
+}
+
 [list]::-webkit-calendar-picker-indicator {
   opacity: 0;
   cursor: text;
@@ -33,6 +42,12 @@
 .input-multiple:checked ~ * .check-icon {
   visibility: visible;
   color: white;
+}
+.industry-input:focus + .drop-icon {
+  transform: rotateZ(180deg);
+}
+.industry-input:focus ~ .industry {
+  display: flex;
 }
 .loader-line {
   width: 200px;

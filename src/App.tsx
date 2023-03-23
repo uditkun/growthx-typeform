@@ -26,6 +26,10 @@ function App() {
     slide: 0,
     userData: {},
   });
+  const [industryData, setIndustryData] = useState({
+    isActive: false,
+    industryList: [],
+  });
   // const [darkMode, setDarkMode] = useState<boolean>(true);
 
   const getTranslateValue = (pos: number, slide: number) => {
@@ -115,8 +119,7 @@ function App() {
 
   const formSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("form submit called");
-    if (slideData.userData.length === 7) {
+    if (Object.values(slideData.userData).length === 7) {
       const postData = await fetch("https://eo3oi83n1j77wgp.m.pipedream.net", {
         method: "POST",
         headers: { "Content-type": "application/json ; charset:utf8" },
@@ -315,46 +318,46 @@ function App() {
               </span>
               <div className="relative">
                 <input
-                  className="shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] pr-8 placeholder:text-lightWhite"
+                  className="industry-input shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] pr-8 placeholder:text-lightWhite"
                   name="industry"
                   placeholder="Type or select an option"
-                  onChange={onChangeInput}
                   required
                 />
                 <FontAwesomeIcon
-                  className="absolute bottom-4 left-[97%] cursor-pointer"
+                  className="absolute top-7 text-white left-[97%] cursor-pointer drop-icon"
                   size="xs"
                   icon={faChevronDown}
                 ></FontAwesomeIcon>
+                <ul className="hidden bg-black absolute z-10 industry w-full mt-2 flex-col gap-1 text-white max-h-80">
+                  <li
+                    className="py-1 px-2 flex items-center justify between shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block"
+                    onClick={() => {
+                      setSlideData((slideData) => {
+                        return {
+                          ...slideData,
+                          userData: { ...slideData.userData, industry: "1" },
+                        };
+                      });
+                      setError(false);
+                    }}
+                  >
+                    <span>1</span>
+                    <FontAwesomeIcon
+                      className="invisible check-icon"
+                      icon={faCheck}
+                    ></FontAwesomeIcon>
+                  </li>
+                  <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
+                    2
+                  </li>
+                  <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
+                    3
+                  </li>
+                  <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
+                    4
+                  </li>
+                </ul>
               </div>
-              <ul
-                id="industry"
-                className="w-full -mt-2 flex flex-col gap-1 text-white max-h-80"
-              >
-                <li
-                  className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block"
-                  onClick={() => {
-                    setSlideData((slideData) => {
-                      return {
-                        ...slideData,
-                        userData: { ...slideData.userData, industry: "1" },
-                      };
-                    });
-                    setError(false);
-                  }}
-                >
-                  1
-                </li>
-                <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
-                  2
-                </li>
-                <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
-                  3
-                </li>
-                <li className="py-1 px-2 shadow-checkbox rounded hover:bg-lightWhite cursor-pointer transition-block">
-                  4
-                </li>
-              </ul>
               <ButtonBlock
                 error={error}
                 func={onEnterSlideChange}

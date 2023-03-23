@@ -12,7 +12,7 @@ const ButtonBlock = ({ type, error, message, func }: Button) => {
   switch (type) {
     case "pressEnter": {
       return (
-        <>
+        <div className="relative h-[50px]">
           <div
             className={
               error
@@ -40,20 +40,20 @@ const ButtonBlock = ({ type, error, message, func }: Button) => {
             </span>
           </div>
           <div
-            className={`rounded transition-block border border-red-600 bg-red-100 text-red-700 px-2 py-1 flex gap-2 items-center ${
+            className={`rounded absolute transition-block border border-red-600 bg-red-50 text-red-700 px-2 py-1 flex gap-2 items-center text-sm w-full sm:w-fit font-[sans-serif] ${
               error ? "visible" : "invisible"
             }`}
           >
             <FontAwesomeIcon icon={faWarning}></FontAwesomeIcon>
             <span>{message}</span>
           </div>
-        </>
+        </div>
       );
     }
 
     default: {
       return (
-        <>
+        <div className="relative h-[50px]">
           <button
             type="button"
             className={`flex items-center justify-center gap-1 px-[14px] py-2 rounded text-white bg-growthXBlue font-semibold w-fit transition-block ${
@@ -69,14 +69,14 @@ const ButtonBlock = ({ type, error, message, func }: Button) => {
             ></FontAwesomeIcon>
           </button>
           <div
-            className={`rounded transition-block border border-red-600 bg-red-100 text-red-700 px-2 py-1 flex gap-2 items-center ${
+            className={`rounded transition-block border border-red-600 bg-red-50 text-red-700 px-2 py-1 flex gap-2 items-center text-sm w-fill sm:w-fit font-[sans-serif] ${
               error ? "visible" : "invisible"
             }`}
           >
             <FontAwesomeIcon icon={faWarning}></FontAwesomeIcon>
             <span>{message}</span>
           </div>
-        </>
+        </div>
       );
     }
   }
