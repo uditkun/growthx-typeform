@@ -179,15 +179,15 @@ function App() {
     e.preventDefault();
     try {
       if (Object.values(slideData.userData).every((i) => Boolean(i))) {
-        // const postData = await fetch(
-        //   "https://eo3oi83n1j77wgp.m.pipedream.net",
-        //   {
-        //     method: "POST",
-        //     headers: { "Content-type": "application/json ; charset:utf8" },
-        //     body: JSON.stringify(slideData.userData),
-        //   }
-        // ).then((res) => res.json());
-        // console.log(postData);
+        const postData = await fetch(
+          "https://eo3oi83n1j77wgp.m.pipedream.net",
+          {
+            method: "POST",
+            headers: { "Content-type": "application/json ; charset:utf8" },
+            body: JSON.stringify(slideData.userData),
+          }
+        ).then((res) => res.json());
+        console.log(postData);
         setSlideData((slideData) => {
           return { ...slideData, isSubmitted: true };
         });
