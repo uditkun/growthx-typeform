@@ -220,7 +220,11 @@ function App() {
           ></div>
         </div>
         {/* Header/Navbar */}
-        <nav className="h-16 sticky top-1 flex justify-between items-center py-3 px-4 z-10">
+        <nav
+          className={`h-16 transition-block sticky top-1 flex justify-between items-center py-3 px-4 z-10 ${
+            slideData.isLoaded ? "visible" : "invisible"
+          }`}
+        >
           <div className="w-[96px]">
             <img
               className="w-full h-auto"
