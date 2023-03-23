@@ -28,8 +28,9 @@ function App() {
       role: "",
       goal: [],
       email: "",
-      phone: 0,
+      phone: NaN,
     },
+    isSubmitted: false,
   });
   const [industryList, setIndustryList] = useState([
     "Animation",
@@ -80,7 +81,6 @@ function App() {
     };
 
     const enterHandler = (e: KeyboardEvent) => {
-      console.log(e.key);
       if (e.key === "Enter") {
         if (slideData.slide === 7) {
           formSubmit(e);
@@ -177,13 +177,23 @@ function App() {
 
   const formSubmit = async (e: any) => {
     e.preventDefault();
-    if (Object.values(slideData.userData).every((i) => Boolean(i))) {
-      const postData = await fetch("https://eo3oi83n1j77wgp.m.pipedream.net", {
-        method: "POST",
-        headers: { "Content-type": "application/json ; charset:utf8" },
-        body: JSON.stringify(slideData.userData),
-      }).then((res) => res.json());
-      console.log(postData);
+    try {
+      if (Object.values(slideData.userData).every((i) => Boolean(i))) {
+        // const postData = await fetch(
+        //   "https://eo3oi83n1j77wgp.m.pipedream.net",
+        //   {
+        //     method: "POST",
+        //     headers: { "Content-type": "application/json ; charset:utf8" },
+        //     body: JSON.stringify(slideData.userData),
+        //   }
+        // ).then((res) => res.json());
+        // console.log(postData);
+        setSlideData((slideData) => {
+          return { ...slideData, isSubmitted: true };
+        });
+      }
+    } catch (error) {
+      console.log("error submitting the form");
     }
   };
 
@@ -228,18 +238,10 @@ function App() {
         <TypeformInput type="text" {...dataFlow[0]} slide={slide} userInput={userInput}/>
         <TypeformInput type="text" {...dataFlow[1]} slide={slide} userInput={userInput}/> */}
         <form
-          className="pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800 overflow-hidden"
+          className={`pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800 overflow-hidden ${
+            slideData.isSubmitted ? "hidden" : "block"
+          }`}
           onWheel={debounceHandler}
-          onKeyDown={(e) => {
-            console.log(e.key);
-            if (e.key === "enter") {
-              if (slideData.slide === 7) {
-                formSubmit(e);
-                return;
-              }
-              onEnterSlideChange();
-            }
-          }}
         >
           {/* Intro slide  */}
           <div
@@ -793,12 +795,17 @@ function App() {
                   type="tel"
                   name="phone"
                   placeholder="1234567899"
-                  onChange={(e) => {
-                    if (/\D/.test(String(slideData.userData.phone))) {
+                  onKeyDown={(e) => {
+                    if (
+                      !Number(e.key) &&
+                      e.key !== "Backspace" &&
+                      e.key !== "0"
+                    ) {
+                      e.preventDefault();
                       return;
                     }
-                    onChangeInput(e);
                   }}
+                  onChange={onChangeInput}
                   required
                 />
               </div>
@@ -816,8 +823,8 @@ function App() {
                 onClick={(e) => {
                   e.preventDefault();
                   if (
-                    String(slideData.userData.phone).length <= 11 &&
-                    /\D/.test(String(slideData.userData.phone))
+                    String(slideData.userData.phone).length > 5 &&
+                    Number(slideData.userData.phone)
                   ) {
                     formSubmit(e);
                     return;
@@ -831,6 +838,14 @@ function App() {
             </div>
           </div>
         </form>
+
+        <div
+          className={`absolute min-h-full w-full flex items-center justify-center text-white text-2xl ${
+            slideData.isSubmitted ? "block" : "hidden"
+          }`}
+        >
+          All done! Thanks for your time.
+        </div>
       </div>
     </div>
   );
