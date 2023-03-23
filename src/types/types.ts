@@ -9,6 +9,7 @@ export type SlideData = {
     email: string;
     phone: number;
   };
+  isSubmitted: boolean;
 };
 
 export type FlagsList = {
