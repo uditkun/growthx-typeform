@@ -10,6 +10,7 @@ export type SlideData = {
     phone: number;
   };
   isSubmitted: boolean;
+  isLoaded: boolean;
 };
 
 export type FlagsList = {

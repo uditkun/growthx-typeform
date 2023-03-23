@@ -31,6 +31,7 @@ function App() {
       phone: NaN,
     },
     isSubmitted: false,
+    isLoaded: false,
   });
   const [industryList, setIndustryList] = useState([
     "Animation",
@@ -69,7 +70,6 @@ function App() {
         const fetchFlags = await fetch(
           "https://flagcdn.com/en/codes.json"
         ).then((res) => res.json());
-        console.log(fetchFlags);
         if (fetchFlags) {
           setFlagsList((flags) => {
             return { ...flags, flagList: fetchFlags };
@@ -90,8 +90,13 @@ function App() {
       }
     };
     addEventListener("keydown", enterHandler, true);
-    getIndustrylist();
-    getFlagslist();
+    (async () => {
+      await getIndustrylist();
+      await getFlagslist();
+      setSlideData((slideData) => {
+        return { ...slideData, isLoaded: true };
+      });
+    })();
 
     return () => {
       removeEventListener("keydown", enterHandler, true);
@@ -187,7 +192,7 @@ function App() {
             body: JSON.stringify(slideData.userData),
           }
         ).then((res) => res.json());
-        console.log(postData);
+        // console.log(postData);
         setSlideData((slideData) => {
           return { ...slideData, isSubmitted: true };
         });
@@ -219,7 +224,7 @@ function App() {
           <div className="w-[96px]">
             <img
               className="w-full h-auto"
-              src={"growthXDark.png"}
+              src="growthXDark.png"
               alt="GrowthX Logo"
             />
           </div>
@@ -237,10 +242,26 @@ function App() {
         {/* Tried componetizing full slide but variations are many hence just sticking with plain code for now and only making simple components
         <TypeformInput type="text" {...dataFlow[0]} slide={slide} userInput={userInput}/>
         <TypeformInput type="text" {...dataFlow[1]} slide={slide} userInput={userInput}/> */}
+        <div
+          className={`absolute transition-block top-0 w-full min-h-full flex justify-center items-center ${
+            slideData.isLoaded ? "opacity-0 invisible -z-50" : "visible"
+          }`}
+        >
+          <div className="flex flex-col justify-center items-center">
+            <div className="w-[96px]">
+              <img
+                className="w-full h-auto"
+                src="growthXDark.png"
+                alt="GrowthX"
+              />
+            </div>
+            <div className="loader-line"></div>
+          </div>
+        </div>
         <form
           className={`pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800 overflow-hidden ${
             slideData.isSubmitted ? "hidden" : "block"
-          }`}
+          } ${slideData.isLoaded ? "block" : "hidden"}`}
           onWheel={debounceHandler}
         >
           {/* Intro slide  */}
@@ -270,6 +291,7 @@ function App() {
                 <button
                   type="button"
                   className="flex items-center justify-center gap-1 px-[14px] p-2 rounded text-white bg-growthXBlue font-semibold w-fit"
+                  onClick={onEnterSlideChange}
                 >
                   I agree
                 </button>

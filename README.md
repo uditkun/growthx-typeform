@@ -8,16 +8,20 @@ Some of the features of this form:-
 
 ✅ State change and error handling on scroll
 
+✅ Progress bar
+
 ✅ Submit form functionality
 
 ✅ Customized components
 
+✅ Added Flags data support
+
 Features still under development
 
-⛔ Loading Screen, Blink Effect Animations
+⚠️ Industry data loading shows cors error
 
-⛔ Industries and Flags data integrations
+⛔ Blink Effect and other Animations
 
 ⛔ Some code formatting
 
-⛔ Toggle Dark mode
+You can view the live web app/form [here](https://luminous-sable-cde89b.netlify.app/).
