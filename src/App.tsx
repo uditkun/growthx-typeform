@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import debounce from "../src/utils/debounce";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   goalChoicesFounder,
@@ -11,34 +10,12 @@ import {
   faChevronDown,
   faCheck,
   faWarning,
-  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import ButtonBlock from "./components/ButtonBlock";
 import QuestionNumber from "./components/QuestionNumber";
 import useClickOutside from "./hooks/useClickOutside";
-
-type SlideData = {
-  slide: number;
-  userData: {
-    firstName: string;
-    lastName: string;
-    industry: string;
-    role: string;
-    goal: string[];
-    email: string;
-    phone: number;
-  };
-};
-
-type FlagsList = {
-  currentFlag: {
-    code: string;
-    country: string;
-  };
-  flagList: {
-    [key: string]: string;
-  };
-};
+import { SlideData, FlagsList } from "./types/types";
+import { getTranslateValue, debounce } from "./utils";
 
 function App() {
   const [error, setError] = useState<boolean>(false);
@@ -54,7 +31,12 @@ function App() {
       phone: 0,
     },
   });
-  const [industryList, setIndustryList] = useState(["1", "2", "3", "4"]);
+  const [industryList, setIndustryList] = useState([
+    "Animation",
+    "Gaming",
+    "IT",
+    "Sports",
+  ]);
   const [flagsList, setFlagsList] = useState<FlagsList>({
     currentFlag: { code: "in", country: "India" },
     flagList: { in: "India" },
@@ -96,18 +78,26 @@ function App() {
         console.log(error);
       }
     };
+
+    const enterHandler = (e: KeyboardEvent) => {
+      console.log(e.key);
+      if (e.key === "Enter") {
+        if (slideData.slide === 7) {
+          formSubmit(e);
+          return;
+        }
+        onEnterSlideChange();
+      }
+    };
+    addEventListener("keydown", enterHandler, true);
     getIndustrylist();
     getFlagslist();
+
+    return () => {
+      removeEventListener("keydown", enterHandler, true);
+    };
   }, []);
   // const [darkMode, setDarkMode] = useState<boolean>(true);
-
-  const getTranslateValue = (pos: number, slide: number) => {
-    //Returns classnames for respective elements in order to facilitate scroll like experience
-    let translateValue = slide * 100 - pos * 100;
-    return translateValue > 0
-      ? `-translate-y-${Math.abs(translateValue)} opacity-0`
-      : `translate-y-${Math.abs(translateValue)} opacity-0`;
-  };
 
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -187,7 +177,7 @@ function App() {
 
   const formSubmit = async (e: any) => {
     e.preventDefault();
-    if (Object.values(slideData.userData).length === 7) {
+    if (Object.values(slideData.userData).every((i) => Boolean(i))) {
       const postData = await fetch("https://eo3oi83n1j77wgp.m.pipedream.net", {
         method: "POST",
         headers: { "Content-type": "application/json ; charset:utf8" },
@@ -241,8 +231,9 @@ function App() {
           className="pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800 overflow-hidden"
           onWheel={debounceHandler}
           onKeyDown={(e) => {
+            console.log(e.key);
             if (e.key === "enter") {
-              if (Object.values(slideData.userData).every((i) => Boolean(i))) {
+              if (slideData.slide === 7) {
                 formSubmit(e);
                 return;
               }
@@ -802,7 +793,12 @@ function App() {
                   type="tel"
                   name="phone"
                   placeholder="1234567899"
-                  onChange={onChangeInput}
+                  onChange={(e) => {
+                    if (/\D/.test(String(slideData.userData.phone))) {
+                      return;
+                    }
+                    onChangeInput(e);
+                  }}
                   required
                 />
               </div>
@@ -812,7 +808,7 @@ function App() {
                 }`}
               >
                 <FontAwesomeIcon icon={faWarning}></FontAwesomeIcon>
-                <span>Please enter your phone/mobile number</span>
+                <span>Please enter a valid phone/mobile number</span>
               </div>
 
               <button
