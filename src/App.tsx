@@ -30,6 +30,16 @@ type SlideData = {
   };
 };
 
+type FlagsList = {
+  currentFlag: {
+    code: string;
+    country: string;
+  };
+  flagList: {
+    [key: string]: string;
+  };
+};
+
 function App() {
   const [error, setError] = useState<boolean>(false);
   const [slideData, setSlideData] = useState<SlideData>({
@@ -45,11 +55,16 @@ function App() {
     },
   });
   const [industryList, setIndustryList] = useState(["1", "2", "3", "4"]);
-  const [flagList, setFlagList] = useState({
+  const [flagsList, setFlagsList] = useState<FlagsList>({
     currentFlag: { code: "in", country: "India" },
-    flagList: [],
+    flagList: { in: "India" },
   });
-  const isIndustryListActive = useClickOutside("industry-input");
+  const {
+    isActive: isIndustryListActive,
+    changeOutside: setIsIndustryListActive,
+  } = useClickOutside("industry-input");
+  const { isActive: isFlagListActive, changeOutside: setIsFlagListActive } =
+    useClickOutside("flags-input");
 
   //fetch industry list
   useEffect(() => {
@@ -60,7 +75,7 @@ function App() {
           { mode: "no-cors" }
         ).then((res) => res.json());
         // console.log(data);
-        setIndustryList((industryList) => data);
+        setIndustryList(data);
       } catch (err) {
         console.log("error fetching industry list");
       }
@@ -73,7 +88,7 @@ function App() {
         ).then((res) => res.json());
         console.log(fetchFlags);
         if (fetchFlags) {
-          setFlagList((flags) => {
+          setFlagsList((flags) => {
             return { ...flags, flagList: fetchFlags };
           });
         }
@@ -82,7 +97,7 @@ function App() {
       }
     };
     getIndustrylist();
-    // getFlagslist();
+    getFlagslist();
   }, []);
   // const [darkMode, setDarkMode] = useState<boolean>(true);
 
@@ -127,7 +142,7 @@ function App() {
         shouldNav = Boolean(slideData.userData.role);
       }
       if (slideData.slide === 5) {
-        shouldNav = Boolean(slideData.userData.goal);
+        shouldNav = Boolean(slideData.userData.goal.length === 2);
       }
       if (slideData.slide === 6) {
         shouldNav = Boolean(slideData.userData.email);
@@ -219,12 +234,15 @@ function App() {
           </button> */}
         </nav>
         {/* Typeform */}
+        {/* Tried componetizing full slide but variations are many hence just sticking with plain code for now and only making simple components
+        <TypeformInput type="text" {...dataFlow[0]} slide={slide} userInput={userInput}/>
+        <TypeformInput type="text" {...dataFlow[1]} slide={slide} userInput={userInput}/> */}
         <form
           className="pt-4 sm:text-xl relative -top-20 w-full h-screen text-gray-800 overflow-hidden"
           onWheel={debounceHandler}
           onKeyDown={(e) => {
             if (e.key === "enter") {
-              if (slideData.slide === 7) {
+              if (Object.values(slideData.userData).every((i) => Boolean(i))) {
                 formSubmit(e);
                 return;
               }
@@ -346,10 +364,6 @@ function App() {
             </div>
           </div>
 
-          {/* Tried componetizing full slide but variations are many hence just sticking with plain code and only makinf simple components */}
-          {/* <TypeformInput type="text" {...dataFlow[0]} slide={slide} userInput={userInput}/>
-          <TypeformInput type="text" {...dataFlow[1]} slide={slide} userInput={userInput}/> */}
-
           {/* 3.Select industry slide  */}
           <div
             className={`slide transition-block ${getTranslateValue(
@@ -406,8 +420,9 @@ function App() {
                               },
                             };
                           });
+                          setIsIndustryListActive(false);
                           setError(false);
-                          onEnterSlideChange();
+                          setTimeout(onEnterSlideChange, 700);
                         }}
                       >
                         <span>{item}</span>
@@ -463,24 +478,6 @@ function App() {
                           type="radio"
                           id={data.description}
                           value={data.description}
-                          onChange={(e) => {
-                            console.log(
-                              slideData.userData.role.includes(e.target.value)
-                            );
-                            if (
-                              slideData.userData.role.includes(e.target.value)
-                            ) {
-                              setSlideData((slideData) => {
-                                return {
-                                  ...slideData,
-                                  userData: { ...slideData.userData, role: "" },
-                                };
-                              });
-                            } else {
-                              onChangeInput(e);
-                            }
-                            onEnterSlideChange();
-                          }}
                           name="role"
                         />
                         <label
@@ -489,6 +486,33 @@ function App() {
                               ? "shadow-checkboxActive"
                               : "shadow-checkbox"
                           }`}
+                          onClick={() => {
+                            console.log(
+                              slideData.userData.role.includes(data.description)
+                            );
+                            if (
+                              slideData.userData.role.includes(data.description)
+                            ) {
+                              setSlideData((slideData) => {
+                                return {
+                                  ...slideData,
+                                  userData: { ...slideData.userData, role: "" },
+                                };
+                              });
+                            } else {
+                              setSlideData((slideData) => {
+                                return {
+                                  ...slideData,
+                                  userData: {
+                                    ...slideData.userData,
+                                    role: data.description,
+                                  },
+                                };
+                              });
+                            }
+                            setError(false);
+                            setTimeout(onEnterSlideChange, 700);
+                          }}
                           htmlFor={data.description}
                         >
                           <div className="flex justify-center items-center gap-2">
@@ -566,18 +590,26 @@ function App() {
                               data.description
                             ) && slideData.userData.goal.length === 2
                           }
-                          onChange={(e) => {
-                            if (slideData.userData.goal.length >= 2) {
+                          name="goal"
+                        />
+                        <label
+                          className={`rounded bg-[#ffffff1a] text-base sm:text-xl text-white hover:bg-lightWhite cursor-pointer p-1 px-2 flex justify-between items-center gap-2 w-full ${
+                            slideData.userData.goal.includes(data.description)
+                              ? "shadow-checkboxActive"
+                              : "shadow-checkbox"
+                          }`}
+                          onClick={() => {
+                            if (slideData.userData.goal.length > 2) {
                               return;
                             }
                             setSlideData((slideData) => {
                               const alreadyExists =
                                 slideData.userData.goal.includes(
-                                  e.target.value
+                                  data.description
                                 );
                               if (alreadyExists) {
                                 const newGoal = slideData.userData.goal.filter(
-                                  (item) => item.includes(e.target.value)
+                                  (item) => !item.includes(data.description)
                                 );
                                 return {
                                   ...slideData,
@@ -589,7 +621,7 @@ function App() {
                               } else {
                                 const newGoal = [
                                   ...slideData.userData.goal,
-                                  e.target.value,
+                                  data.description,
                                 ];
                                 return {
                                   ...slideData,
@@ -600,16 +632,8 @@ function App() {
                                 };
                               }
                             });
-                            // onEnterSlideChange();
+                            setError(false);
                           }}
-                          name="goal"
-                        />
-                        <label
-                          className={`rounded bg-[#ffffff1a] text-base sm:text-xl text-white hover:bg-lightWhite cursor-pointer p-1 px-2 flex justify-between items-center gap-2 w-full ${
-                            slideData.userData.goal.includes(data.description)
-                              ? "shadow-checkboxActive"
-                              : "shadow-checkbox"
-                          }`}
                           htmlFor={data.description}
                         >
                           <div className="flex justify-center items-center gap-2">
@@ -643,7 +667,7 @@ function App() {
               <ButtonBlock
                 error={error}
                 func={onEnterSlideChange}
-                message="Please select your goal"
+                message="Please select any two of your goals"
               />
             </div>
           </div>
@@ -676,7 +700,16 @@ function App() {
                 type="email"
                 name="email"
                 placeholder="name@example.com"
-                onChange={onChangeInput}
+                onChange={(e) => {
+                  const validEmailRegex =
+                    /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                  if (validEmailRegex.test(String(e.target.value))) {
+                    onChangeInput(e);
+                    setError(false);
+                    return;
+                  }
+                  setError(true);
+                }}
                 required
               />
               <ButtonBlock
@@ -711,20 +744,58 @@ function App() {
                 your application.
               </span>
               <div className="flex gap-2">
-                <div className="w-fit shadow-input">
+                <div id="flags-input" className="w-fit shadow-input">
                   <span className="flex gap-2 mt-5 pr-2">
                     <img
-                      src={`https://flagcdn.com/${flagList.currentFlag.code}.svg`}
+                      src={`https://flagcdn.com/${flagsList.currentFlag.code}.svg`}
                       width="30"
-                      alt={flagList.currentFlag.country}
+                      alt={flagsList.currentFlag.country}
                     />
                     <FontAwesomeIcon
                       icon={faChevronDown}
+                      className="ml-1 mt-[2px]"
                       color="white"
                       size="sm"
                     ></FontAwesomeIcon>
                   </span>
-                  <ul className="absolute">{}</ul>
+                  <ul
+                    className={`absolute max-w-sm mt-6 w-full h-80 overflow-y-scroll bg-black ${
+                      isFlagListActive ? "block" : "hidden"
+                    }`}
+                    onWheel={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    {Object.keys(flagsList.flagList).map((item: string) => {
+                      return (
+                        <li
+                          key={item}
+                          className="flex gap-4 py-1 px-2 items-center mt-2 shadow-checkbox bg-[#ffffff1a] rounded hover:bg-lightWhite cursor-pointer transition-block"
+                          onClick={() => {
+                            setFlagsList((flagsList) => {
+                              return {
+                                ...flagsList,
+                                currentFlag: {
+                                  code: item,
+                                  country: flagsList.flagList[item],
+                                },
+                              };
+                            });
+                            setIsFlagListActive(false);
+                          }}
+                        >
+                          <span>
+                            <img
+                              src={`https://flagcdn.com/${item}.svg`}
+                              width="30"
+                              alt={flagsList.flagList[item]}
+                            />
+                          </span>
+                          {flagsList.flagList[item]}
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
                 <input
                   className="max-w-[450px] shadow-input focus:shadow-inputFocus outline-none dark:border-white dark:text-white w-full mt-4 pb-2 block bg-transparent text-3xl leading-[unset] placeholder:text-lightWhite"
@@ -736,24 +807,26 @@ function App() {
                 />
               </div>
               <div
-                className={`rounded transition-block border border-red-600 bg-red-100 text-red-700 px-2 py-1 flex gap-2 items-center ${
+                className={`rounded transition-block border border-red-600 bg-red-50 text-red-700 px-2 py-1 flex gap-2 items-center text-sm w-fill sm:w-fit font-[sans-serif] ${
                   error ? "visible" : "invisible"
                 }`}
               >
                 <FontAwesomeIcon icon={faWarning}></FontAwesomeIcon>
-                <span>Please enter a valid phone number.</span>
+                <span>Please enter your phone/mobile number</span>
               </div>
 
               <button
                 type="submit"
                 onClick={(e) => {
+                  e.preventDefault();
                   if (
-                    String(slideData.userData.phone).length !== 10 &&
+                    String(slideData.userData.phone).length <= 11 &&
                     /\D/.test(String(slideData.userData.phone))
                   ) {
-                    setError(true);
+                    formSubmit(e);
+                    return;
                   }
-                  formSubmit(e);
+                  setError(true);
                 }}
                 className="px-3 py-2 rounded bg-growthXBlue text-white font-semibold self-center w-full sm:w-fit"
               >

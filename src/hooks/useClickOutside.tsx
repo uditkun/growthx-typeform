@@ -21,7 +21,7 @@ const useClickOutside = (parentId: string) => {
     };
   }, [parentId]);
 
-  return isActive;
+  return { isActive, changeOutside: setIsActive };
 };
 
 export default useClickOutside;

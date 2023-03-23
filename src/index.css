@@ -35,14 +35,9 @@ input:-webkit-autofill:active {
   opacity: 0;
   cursor: text;
 }
-/* .input-multiple:checked ~ * .alphabet {
-  background-color: white;
-  color: black;
+input:disabled ~ label {
+  opacity: 50%;
 }
-.input-multiple:checked ~ * .check-icon {
-  visibility: visible;
-  color: white;
-} */
 .drop-icon {
   transform: rotateZ(180deg);
 }
